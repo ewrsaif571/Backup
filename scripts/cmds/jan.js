@@ -3,7 +3,7 @@ const baseApiUrl = async () => "https://mahmud-x8mi.onrender.com";
 
 module.exports = {
   config: {
-    name: "bot2",
+    name: "jan",
     version: "1.7",
     author: "MahMUD",
     role: 0,
