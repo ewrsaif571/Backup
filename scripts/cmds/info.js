@@ -1,14 +1,15 @@
 const fs = require("fs-extra");
 const request = require("request");
 const os = require("os");
+const path = require("path");
 
 module.exports = {
   config: {
     name: "info",
-    version: "1.3",
+    version: "1.4",
     author: "Ayan mgi 🥰",
-    shortDescription: "Display bot and user information along with uptime and Imgur images/videos.",
-    longDescription: "Show detailed info about the bot and the user, with uptime and Imgur image/video features.",
+    shortDescription: "Display bot and user info with uptime and random Imgur video.",
+    longDescription: "Show detailed info about the bot and the user, with uptime and send random Imgur video.",
     category: "info",
     guide: {
       en: "[user]",
@@ -16,41 +17,49 @@ module.exports = {
   },
 
   onStart: async function ({ api, event, args }) {
-    // Replace with your info
+    // User Information
     const userInfo = {
-      name: "SAIF ISLAM",  // Replace with your name
-      age: "15+",           // Replace with your age
-      location: "Sirajganj",    // Replace with your location
-      bio: "Bot & JavaScript Lover | Idk 🙂", // Replace with your bio
-      botName: "Twinkle 🎀", // Replace with bot's name
-      botVersion: "1.0",    // Replace with bot's version
+      name: "SAIF ISLAM",
+      age: "15+",
+      location: "Sirajganj",
+      bio: "Bot & JavaScript Lover | Idk 🙂",
+      botName: "Twinkle 🎀",
+      botVersion: "1.0",
     };
 
-    // Calculate bot uptime
-    const botUptime = process.uptime(); // in seconds
+    // Bot Uptime
+    const botUptime = process.uptime();
     const botHours = Math.floor(botUptime / 3600);
     const botMinutes = Math.floor((botUptime % 3600) / 60);
     const botSeconds = Math.floor(botUptime % 60);
-    const formattedBotUptime = `${botHours} hours, ${botMinutes} minutes, ${botSeconds} seconds`;
+    const formattedBotUptime = `${botHours}h ${botMinutes}m ${botSeconds}s`;
 
-    // Calculate system uptime in days, hours, minutes, and seconds
-    const systemUptime = os.uptime(); // in seconds
-    const sysDays = Math.floor(systemUptime / (3600 * 24)); // Convert seconds to days
-    const sysHours = Math.floor((systemUptime % (3600 * 24)) / 3600); // Remaining hours
-    const sysMinutes = Math.floor((systemUptime % 3600) / 60); // Remaining minutes
-    const sysSeconds = Math.floor(systemUptime % 60); // Remaining seconds
-    const formattedSystemUptime = `${sysDays} days, ${sysHours} hours, ${sysMinutes} minutes, ${sysSeconds} seconds`;
+    // System Uptime
+    const systemUptime = os.uptime();
+    const sysDays = Math.floor(systemUptime / (3600 * 24));
+    const sysHours = Math.floor((systemUptime % (3600 * 24)) / 3600);
+    const sysMinutes = Math.floor((systemUptime % 3600) / 60);
+    const sysSeconds = Math.floor(systemUptime % 60);
+    const formattedSystemUptime = `${sysDays}d ${sysHours}h ${sysMinutes}m ${sysSeconds}s`;
 
-    // Example Imgur video links
+    // Imgur Video Links
     const imgurLinks = [
       "https://i.imgur.com/DfTQ5i6.mp4",
       "https://i.imgur.com/R4iAMnn.mp4",
       "https://i.imgur.com/9MoSlTY.mp4",
       "https://i.imgur.com/UiTaUXv.mp4",
       "https://i.imgur.com/CJsIzBc.mp4",
+      "https://i.imgur.com/iJOz5pv.mp4",
+      "https://i.imgur.com/ayCtv8c.mp4",
+      "https://i.imgur.com/dTFkLfO.mp4",
+      "https://i.imgur.com/Ov9Iq7A.mp4",
     ];
 
-    // Download videos and send them as attachments
+    // Pick a random video
+    const randomLink = imgurLinks[Math.floor(Math.random() * imgurLinks.length)];
+    const videoPath = path.join(__dirname, "/cache/randomVideo.mp4");
+
+    // Download the random video
     const downloadVideo = (url, filePath) => {
       return new Promise((resolve, reject) => {
         request(url)
@@ -60,8 +69,10 @@ module.exports = {
       });
     };
 
-    // Construct the body message with more space
-    const bodyMsg = `
+    try {
+      await downloadVideo(randomLink, videoPath);
+
+      const bodyMsg = `
 Information: 🥷
 
 - Name: ${userInfo.name}
@@ -77,31 +88,26 @@ Bot Details:
 
 System Uptime:
 
-- System Uptime: ${formattedSystemUptime}
+- ${formattedSystemUptime}
 
 ─────────────────────
 `;
 
-    // Prepare video attachments
-    const videoPaths = [];
-    for (let i = 0; i < imgurLinks.length; i++) {
-      const videoPath = __dirname + `/cache/video${i}.mp4`;
-      await downloadVideo(imgurLinks[i], videoPath);
-      videoPaths.push(videoPath);
+      api.sendMessage(
+        {
+          body: bodyMsg,
+          attachment: fs.createReadStream(videoPath),
+        },
+        event.threadID,
+        () => {
+          // Delete the downloaded video after sending
+          fs.unlinkSync(videoPath);
+        },
+        event.messageID
+      );
+    } catch (err) {
+      console.error(err);
+      api.sendMessage("An error occurred while processing your request.", event.threadID, event.messageID);
     }
-
-    // Send message with info and video attachments
-    api.sendMessage(
-      { 
-        body: bodyMsg, 
-        attachment: videoPaths.map(path => fs.createReadStream(path))
-      },
-      event.threadID,
-      () => {
-        // Clean up downloaded video files
-        videoPaths.forEach(path => fs.unlinkSync(path));
-      },
-      event.messageID
-    );
   },
 };
