@@ -40,14 +40,12 @@ module.exports = {
       const message = `
 ✦ ━━━━━━━ ✧ ━━━━━━━ ✦
    𝗧𝗪𝗜𝗡𝗞𝗟𝗘 𝗦𝗧𝗔𝗧𝗦 >🎀
-✦ ━━━━━━━ ✧ ━━━━━━━ ✦
-╭────────────◊
-├‣ 𝗨𝗣𝗧𝗜𝗠𝗘 » ${uptimeString}
-├‣ 𝗨𝗦𝗘𝗥𝗦 » ${allUsers.length.toLocaleString()}
-├‣ 𝗧𝗛𝗥𝗘𝗔𝗗𝗦 » ${allThreads.length.toLocaleString()}
-├‣ 𝗔𝗖𝗧𝗜𝗩𝗘 » ${activeThreads.toLocaleString()}
-├‣ 𝗠𝗘𝗦𝗦𝗔𝗚𝗘𝗦 » ${totalMessages.toLocaleString()}
-╰────────────◊  
+
+𝗨𝗣𝗧𝗜𝗠𝗘 » ${uptimeString}
+𝗨𝗦𝗘𝗥𝗦 » ${allUsers.length.toLocaleString()}
+𝗧𝗛𝗥𝗘𝗔𝗗𝗦 » ${allThreads.length.toLocaleString()}
+𝗔𝗖𝗧𝗜𝗩𝗘 » ${activeThreads.toLocaleString()}
+𝗠𝗘𝗦𝗦𝗔𝗚𝗘𝗦 » ${totalMessages.toLocaleString()}
       `;
 
       api.sendMessage(message.trim(), event.threadID);
