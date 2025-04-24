@@ -11,7 +11,7 @@ module.exports = {
     longDescription: {
       en: "Displays the total number of users who have interacted with the bot and check uptime."
     },
-    category: "RUNNING-TIME",
+    category: "system",
     guide: {
       en: "Type {pn}"
     }
